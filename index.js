@@ -66,9 +66,9 @@ app.post('/api/auth/register', async (req, res) => {
     } catch (error) {
         console.error('Error al registrar el usuario:', error);
         
-        // Manejo específico del error de clave duplicada (código 23505)
+        // Manejo específico del error de clave duplicada (codigo 23505)
         if (error.code === '23505') { 
-            return res.status(409).json({ error: 'El nombre de usuario o el email ya están en uso.' });
+            return res.status(409).json({ error: 'El nombre de usuario o el email ya estan en uso.' });
         }
 
         return res.status(500).json({ error: 'Error interno del servidor durante el registro.' });
@@ -92,7 +92,7 @@ app.post('/api/auth/login', async (req, res) => {
         const result = await db.query(userQuery, [email]);
         const user = result.rows[0];
 
-        // 2. Verificar la existencia del usuario (o devolver error genérico)
+        // 2. Verificar la existencia del usuario (o devolver error generico)
         if (!user) {
             // Mensaje genérico para evitar dar pistas sobre la existencia del email
             return res.status(401).json({ error: 'Credenciales inválidas.' }); 
@@ -102,7 +102,7 @@ app.post('/api/auth/login', async (req, res) => {
         const match = await bcrypt.compare(password, user.password_hash);
 
         if (!match) {
-            return res.status(401).json({ error: 'Credenciales inválidas.' });
+            return res.status(401).json({ error: 'Credenciales invalidas.' });
         }
 
         // 4. Generar un Token JWT
@@ -112,7 +112,7 @@ app.post('/api/auth/login', async (req, res) => {
             { expiresIn: '24h' } // Token válido por 24 horas
         );
 
-        // 5. Éxito
+        // 5. exito
         return res.status(200).json({
             message: 'Inicio de sesión exitoso',
             token: token,
