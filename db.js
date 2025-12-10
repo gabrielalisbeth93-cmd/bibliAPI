@@ -4,7 +4,7 @@ const { Pool } = require('pg');
 
 // --- Validación y Configuración de Conexión Segura ---
 
-// Función auxiliar para asegurar que las variables de entorno se lean como strings
+// Funcin auxiliar para asegurar que las variables de entorno se lean como strings
 const ensureString = (value, name) => {
     if (typeof value === 'undefined' || value === null) {
         // En un entorno de producción, esto debería lanzar un error.
