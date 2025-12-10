@@ -1,4 +1,4 @@
-// db.js
+
 
 const { Pool } = require('pg');
 
@@ -27,7 +27,14 @@ const config = {
 };
 
 // Crear el Pool
-const pool = new Pool(config);
+//const pool = new Pool(config);
+const pool = new Pool({
+    ...config, // Mantiene todas las variables DB_USER, DB_HOST, etc.
+    ssl: {
+        rejectUnauthorized: false // Esto es CLAVE para la conexion en Render
+    }
+});
+
 
 // --- Función de Prueba de Conexión Inicial ---
 async function testConnection() {
