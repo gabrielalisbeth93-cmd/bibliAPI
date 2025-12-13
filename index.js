@@ -9,13 +9,10 @@ const db = require('./db');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ===============================================================
-// MIDDLEWARE
-// ===============================================================
 app.use(express.json()); 
 
 // Configuración de CORS: Permite peticiones desde cualquier origen para desarrollo.
-// ⚠️ ADVERTENCIA DE SEGURIDAD: En producción, cambia '*' por el dominio específico de tu cliente (ej: https://tudominio.com).
+
 app.use(cors({
     origin: '*', 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -44,8 +41,7 @@ app.post('/api/auth/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // --- 2. Consulta SQL para insertar ---
-        // Nota: Si usas public."Registro_usuario" asegúrate de que el nombre de la tabla
-        // coincida exactamente con la capitalización en tu base de datos PostgreSQL.
+      
         const insertQuery = `
             INSERT INTO public."Registro_usuario" (username, email, password_hash)
             VALUES ($1, $2, $3)
@@ -66,7 +62,7 @@ app.post('/api/auth/register', async (req, res) => {
     } catch (error) {
         console.error('Error al registrar el usuario:', error);
         
-        // Manejo específico del error de clave duplicada (codigo 23505)
+        
         if (error.code === '23505') { 
             return res.status(409).json({ error: 'El nombre de usuario o el email ya estan en uso.' });
         }
@@ -94,7 +90,7 @@ app.post('/api/auth/login', async (req, res) => {
 
         // 2. Verificar la existencia del usuario (o devolver error generico)
         if (!user) {
-            // Mensaje genérico para evitar dar pistas sobre la existencia del email
+            // Mensaje generico para evitar dar pistas sobre la existencia del email
             return res.status(401).json({ error: 'Credenciales inválidas.' }); 
         }
 
@@ -109,7 +105,7 @@ app.post('/api/auth/login', async (req, res) => {
         const token = jwt.sign(
             { id: user.id_usuario, email: user.email },
             process.env.JWT_SECRET,
-            { expiresIn: '24h' } // Token válido por 24 horas
+            { expiresIn: '24h' }
         );
 
         // 5. exito

@@ -1,17 +1,21 @@
 const { Pool } = require('pg');
 
-// --- Creación del Pool usando DATABASE_URL (Render) ---
+// Lógica de detección: si DATABASE_URL existe, se asume producción (Render).
+const isProduction = !!process.env.DATABASE_URL; 
+
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false // requerido en Render
-    }
+    
+    // Configuración SSL Condicional
+    ssl: isProduction ? {
+        rejectUnauthorized: false
+    } : false, // <--- ESTA LÍNEA ES CLAVE
 });
 
-// --- Función de Prueba de Conexión Inicial ---
 async function testConnection() {
     if (!process.env.DATABASE_URL) {
         console.error('❌ ERROR: DATABASE_URL no está definida.');
+        console.error('NOTA: Necesitas definir DATABASE_URL en tu archivo .env local o en el entorno de Render.');
         return;
     }
 
@@ -21,24 +25,26 @@ async function testConnection() {
         client.release();
 
         console.log('----------------------------------------------------');
-        console.log('✅ CONEXIÓN A POSTGRESQL EXITOSA (DATABASE_URL)');
+        console.log(`✅ CONEXIÓN A POSTGRESQL EXITOSA (${isProduction ? 'RENDER CLOUD' : 'LOCALHOST'})`);
         console.log('----------------------------------------------------');
 
     } catch (err) {
         console.error('❌ ERROR FATAL: No se pudo conectar a PostgreSQL.');
         console.error('Detalles del error:', err.message);
+        console.log('----------------------------------------------------');
+        console.log('REVISAR: Asegúrate que tu servidor PostgreSQL local esté corriendo.');
+        if (isProduction) {
+            console.log('REVISAR: Asegúrate que la DATABASE_URL en Render sea la URL de Conexión Interna correcta.');
+        }
     }
 }
 
-// Ejecutar prueba de conexión al iniciar
 testConnection();
 
-// --- Manejo de errores del Pool ---
 pool.on('error', (err) => {
     console.error('❌ Error fatal detectado en el Pool de PostgreSQL:', err.message);
 });
 
-// --- Exportación ---
 module.exports = {
     query: (text, params) => pool.query(text, params),
     pool
